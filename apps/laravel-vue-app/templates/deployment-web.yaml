@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "laravel-vue-app.fullname" . }}-web
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "laravel-vue-app.labels" . | nindent 4 }}
+    app: web
+spec:
+  replicas: {{ .Values.replicas.web }}
+  selector:
+    matchLabels:
+      app: web
+      {{- include "laravel-vue-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: web
+        {{- include "laravel-vue-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: web
+        image: "{{ .Values.images.web.repository }}:{{ .Values.images.web.tag }}"
+        imagePullPolicy: {{ .Values.images.web.pullPolicy }}
+        ports:
+        - containerPort: 9000
+          name: php-fpm
+        envFrom:
+        - configMapRef:
+            name: {{ include "laravel-vue-app.fullname" . }}-env
+        - secretRef:
+            name: {{ include "laravel-vue-app.fullname" . }}-secrets
+        env:
+        # Override Redis host to point to Redis service
+        - name: REDIS_HOST
+          value: "{{ include "laravel-vue-app.fullname" . }}-redis"
+        resources:
+          {{- toYaml .Values.resources.web | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.healthChecks.web.liveness | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.healthChecks.web.readiness | nindent 10 }}
+---
+# Nginx container (sidecar or separate deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "laravel-vue-app.fullname" . }}-nginx
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "laravel-vue-app.labels" . | nindent 4 }}
+    app: nginx
+spec:
+  replicas: {{ .Values.replicas.web }}
+  selector:
+    matchLabels:
+      app: nginx
+      {{- include "laravel-vue-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: nginx
+        {{- include "laravel-vue-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: nginx
+        image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
+        imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
+        ports:
+        - containerPort: 80
+          name: http
+        envFrom:
+        - configMapRef:
+            name: {{ include "laravel-vue-app.fullname" . }}-env
+        - secretRef:
+            name: {{ include "laravel-vue-app.fullname" . }}-secrets
+        env:
+        - name: REDIS_HOST
+          value: "{{ include "laravel-vue-app.fullname" . }}-redis"
+        - name: BACKEND_HOST
+          value: "{{ include "laravel-vue-app.fullname" . }}-web"
+        resources:
+          {{- toYaml .Values.resources.web | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5

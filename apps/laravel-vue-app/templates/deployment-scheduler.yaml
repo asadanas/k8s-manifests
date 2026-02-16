@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "laravel-vue-app.fullname" . }}-scheduler
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "laravel-vue-app.labels" . | nindent 4 }}
+    app: scheduler
+spec:
+  replicas: {{ .Values.replicas.scheduler }}
+  selector:
+    matchLabels:
+      app: scheduler
+      {{- include "laravel-vue-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: scheduler
+        {{- include "laravel-vue-app.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: scheduler
+        image: "{{ .Values.images.web.repository }}:{{ .Values.images.web.tag }}"
+        imagePullPolicy: {{ .Values.images.web.pullPolicy }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          while true; do
+            php artisan schedule:run
+            sleep 60
+          done
+        envFrom:
+        - configMapRef:
+            name: {{ include "laravel-vue-app.fullname" . }}-env
+        - secretRef:
+            name: {{ include "laravel-vue-app.fullname" . }}-secrets
+        env:
+        - name: REDIS_HOST
+          value: "{{ include "laravel-vue-app.fullname" . }}-redis"
+        resources:
+          {{- toYaml .Values.resources.scheduler | nindent 10 }}

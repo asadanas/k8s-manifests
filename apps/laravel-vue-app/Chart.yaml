@@ -1,0 +1,16 @@
+apiVersion: v2
+name: laravel-vue-app
+description: Laravel Vue SPA Application with Redis
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - laravel
+  - vue
+  - spa
+  - php
+  - nginx
+home: https://spa.getnatai.com
+maintainers:
+  - name: Md Asaduzzaman Anas
+    email: asad.anas1994@gmail.com

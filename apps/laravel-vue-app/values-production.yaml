@@ -1,0 +1,179 @@
+# ============================================
+# NAMESPACE & GLOBAL SETTINGS
+# ============================================
+namespace: production
+
+# ============================================
+# IMAGE CONFIGURATION
+# ============================================
+images:
+  web:
+    repository: asadanas/laravel-vue-app
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  nginx:
+    repository: asadanas/laravel-vue-spa-2026-nginx
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+# ============================================
+# REPLICAS
+# ============================================
+replicas:
+  web: 2
+  worker: 2
+  scheduler: 1
+  redis: 1
+
+# ============================================
+# RESOURCE LIMITS
+# ============================================
+resources:
+  web:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+  worker:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+    limits:
+      cpu: "400m"
+      memory: "512Mi"
+  scheduler:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+  redis:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# ============================================
+# ENVIRONMENT VARIABLES (NON-SECRET)
+# ============================================
+env:
+  APP_NAME: "Laravel Vue Spa"
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  APP_LOG_LEVEL: "debug"
+  APP_URL: "https://spa.getnatai.com"
+  
+  # Logging
+  LOG_CHANNEL: "stack"
+  LOG_LEVEL: "debug"
+  
+  # Database (non-secret parts)
+  DB_CONNECTION: "mysql"
+  DB_DATABASE: "laravel"
+  
+  # Laravel runtime
+  BROADCAST_DRIVER: "log"
+  CACHE_DRIVER: "redis"
+  QUEUE_CONNECTION: "redis"
+  SESSION_DRIVER: "redis"
+  SESSION_LIFETIME: "120"
+  
+  # Redis (will be overridden in deployment)
+  REDIS_HOST: "laravel-vue-app-redis"
+  REDIS_PORT: "6379"
+  REDIS_PASSWORD: ""
+  
+  # Mail
+  MAIL_MAILER: "smtp"
+  MAIL_HOST: "smtp.mailtrap.io"
+  MAIL_PORT: "2525"
+  MAIL_ENCRYPTION: "tls"
+  MAIL_FROM_ADDRESS: "hello@example.com"
+  MAIL_FROM_NAME: "Laravel Vue Spa"
+  
+  # AWS
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  AWS_DEFAULT_REGION: "us-east-1"
+  AWS_BUCKET: ""
+  
+  # Pusher
+  PUSHER_APP_ID: ""
+  PUSHER_APP_KEY: ""
+  PUSHER_APP_CLUSTER: "mt1"
+  MIX_PUSHER_APP_KEY: "${PUSHER_APP_KEY}"
+  MIX_PUSHER_APP_CLUSTER: "${PUSHER_APP_CLUSTER}"
+  
+  # JWT
+  JWT_TTL: "1440"
+
+# ============================================
+# REDIS CONFIGURATION
+# ============================================
+redis:
+  enabled: true
+  image: redis:7-alpine
+  port: 6379
+  password: ""  # Empty = no auth (matches your local test)
+  persistence:
+    enabled: true
+    storageClass: "nfs-csi"
+    size: "5Gi"
+    accessMode: "ReadWriteOnce"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# ============================================
+# SERVICE & INGRESS
+# ============================================
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: true
+  className: "nginx"  # Change if using different ingress controller
+  hosts:
+    - host: spa.getnatai.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            servicePort: 80
+  tls:
+    - secretName: spa-getnatai-com-tls
+      hosts:
+        - spa.getnatai.com
+
+# ============================================
+# HEALTH CHECKS
+# ============================================
+healthChecks:
+  web:
+    liveness:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readiness:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
