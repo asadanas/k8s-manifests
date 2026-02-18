@@ -81,20 +81,3 @@ spec:
           value: "{{ include "laravel-vue-app.fullname" . }}-web"
         resources:
           {{- toYaml .Values.resources.web | nindent 10 }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          timeoutSeconds: 10
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 30
-          periodSeconds: 5
-          timeoutSeconds: 10
-          failureThreshold: 3
-
