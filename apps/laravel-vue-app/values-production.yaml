@@ -151,8 +151,8 @@ ingress:
           pathType: Prefix
           backend:
             servicePort: 80
-  tls:
-    - secretName: spa-getnatai-com-tls
-      hosts:
-        - spa.getnatai.com
+#  tls:
+#    - secretName: spa-getnatai-com-tls
+#      hosts:
+#        - spa.getnatai.com
 
