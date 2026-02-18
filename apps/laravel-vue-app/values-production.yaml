@@ -156,3 +156,19 @@ ingress:
 #      hosts:
 #        - spa.getnatai.com
 
+# ============================================
+# ENVIRONMENT VARIABLES (SECRET)
+# ============================================
+secrets:
+  enabled: true
+  
+  # Application secrets
+  appKey: "base64:sgztEi+QEaLgS+8MRSkG2X7cAE7pYEqIvKHKUrUfLhg="  
+  jwtSecret: "A9it6bRt3rf4yeiDaADCI27ttFFH9WfhlqWySqqHG0W3ivM5PZdmSfSunZVcBvJU"
+  
+  # Database credentials
+  dbHost: "45.125.222.194"
+  dbPort: "3306"
+  dbUsername: "root"
+  dbPassword: "84pgT4Lk_Ro}"
+
