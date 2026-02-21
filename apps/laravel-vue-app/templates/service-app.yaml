@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "laravel-vue-app.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: laravel
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: laravel-nginx-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "laravel-vue-app.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    app: laravel
+    tier: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

@@ -1,79 +1,99 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "laravel-vue-app.fullname" . }}-web
+  name: laravel-app
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "laravel-vue-app.labels" . | nindent 4 }}
-    app: web
+    app: laravel
+    tier: backend
 spec:
-  replicas: {{ .Values.replicas.web }}
+  replicas: {{ .Values.app.replicas }}
   selector:
     matchLabels:
-      app: web
-      {{- include "laravel-vue-app.selectorLabels" . | nindent 6 }}
+      app: laravel
+      tier: backend
   template:
     metadata:
       labels:
-        app: web
-        {{- include "laravel-vue-app.selectorLabels" . | nindent 8 }}
+        app: laravel
+        tier: backend
     spec:
       containers:
-      - name: web
-        image: "{{ .Values.images.web.repository }}:{{ .Values.images.web.tag }}"
-        imagePullPolicy: {{ .Values.images.web.pullPolicy }}
-        ports:
-        - containerPort: 9000
-          name: php-fpm
-        envFrom:
-        - configMapRef:
-            name: {{ include "laravel-vue-app.fullname" . }}-env
-        - secretRef:
-            name: {{ include "laravel-vue-app.fullname" . }}-secrets
-        env:
-        # Override Redis host to point to Redis service
-        - name: REDIS_HOST
-          value: "{{ include "laravel-vue-app.fullname" . }}-redis"
-        resources:
-          {{- toYaml .Values.resources.web | nindent 10 }}
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: laravel-config
+            - secretRef:
+                name: laravel-secrets
+            - secretRef:
+                name: db-credentials
+          env:
+            - name: DB_HOST
+              value: {{ .Values.db.host | quote }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: REDIS_HOST
+              value: redis-headless
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
 ---
-# Nginx container (sidecar or separate deployment)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "laravel-vue-app.fullname" . }}-nginx
+  name: laravel-nginx
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "laravel-vue-app.labels" . | nindent 4 }}
-    app: nginx
+    app: laravel
+    tier: frontend
 spec:
-  replicas: {{ .Values.replicas.web }}
+  replicas: {{ .Values.nginx.replicas }}
   selector:
     matchLabels:
-      app: nginx
-      {{- include "laravel-vue-app.selectorLabels" . | nindent 6 }}
+      app: laravel
+      tier: frontend
   template:
     metadata:
       labels:
-        app: nginx
-        {{- include "laravel-vue-app.selectorLabels" . | nindent 8 }}
+        app: laravel
+        tier: frontend
     spec:
       containers:
-      - name: nginx
-        image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
-        imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
-        ports:
-        - containerPort: 80
-          name: http
-        envFrom:
-        - configMapRef:
-            name: {{ include "laravel-vue-app.fullname" . }}-env
-        - secretRef:
-            name: {{ include "laravel-vue-app.fullname" . }}-secrets
-        env:
-        - name: REDIS_HOST
-          value: "{{ include "laravel-vue-app.fullname" . }}-redis"
-        - name: BACKEND_HOST
-          value: "{{ include "laravel-vue-app.fullname" . }}-web"
-        resources:
-          {{- toYaml .Values.resources.web | nindent 10 }}
+        - name: nginx
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: laravel-config
+            - secretRef:
+                name: laravel-secrets
+          env:
+            - name: APP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: laravel-config
+                  key: APP_URL
+            - name: BACKEND_HOST
+              value: laravel-app
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+            requests:
+              memory: "512Mi"
+              cpu: "500m"

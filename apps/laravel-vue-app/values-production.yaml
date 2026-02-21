@@ -1,174 +1,82 @@
-# ============================================
-# NAMESPACE & GLOBAL SETTINGS
-# ============================================
 namespace: production
+appLabel: laravel
 
-# ============================================
-# IMAGE CONFIGURATION
-# ============================================
-images:
-  web:
-    repository: asadanas/laravel-vue-app
-    tag: "latest"
-    pullPolicy: IfNotPresent
-  nginx:
+# Image settings for PHP app
+image:
+  repository: asadanas/laravel-vue-spa-2026-app
+  tag: latest
+  pullPolicy: Always
+
+# Nginx settings - ETA ADD KORTE HOBE!
+nginx:
+  replicas: 2
+  image:
     repository: asadanas/laravel-vue-spa-2026-nginx
-    tag: "latest"
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
 
-# ============================================
-# REPLICAS
-# ============================================
-replicas:
-  web: 2
-  worker: 2
-  scheduler: 1
-  redis: 1
+# App settings
+app:
+  replicas: 2
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
 
-# ============================================
-# RESOURCE LIMITS
-# ============================================
-resources:
-  web:
-    requests:
-      cpu: "500m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
-  worker:
-    requests:
-      cpu: "500m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
-  scheduler:
-    requests:
-      cpu: "500m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
-  redis:
-    requests:
-      cpu: "500m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "1Gi"
+# Database
+db:
+  host: "45.125.222.194"
+  port: "3306"
+  database: "laravel"
+  username: "root"
+  password: "84pgT4Lk_Ro}"
 
-# ============================================
-# ENVIRONMENT VARIABLES (NON-SECRET)
-# ============================================
+# Redis
+redis:
+  image: redis:7-alpine
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: nfs-csi
+
+# Ingress
+domain: spa.getnatai.com
+ingressClassName: nginx
+
+# Environment variables
 env:
   APP_NAME: "Laravel Vue Spa"
   APP_ENV: "production"
   APP_DEBUG: "false"
-  APP_LOG_LEVEL: "debug"
-  APP_URL: "https://spa.getnatai.com"
-  
-  # Logging
+  APP_URL: "http://localhost"
   LOG_CHANNEL: "stack"
-  LOG_LEVEL: "debug"
-  
-  # Database (non-secret parts)
   DB_CONNECTION: "mysql"
-  DB_DATABASE: "laravel"
-  
-  # Laravel runtime
   BROADCAST_DRIVER: "log"
   CACHE_DRIVER: "redis"
   QUEUE_CONNECTION: "redis"
   SESSION_DRIVER: "redis"
   SESSION_LIFETIME: "120"
-  
-  # Redis (will be overridden in deployment)
-  REDIS_HOST: "laravel-vue-app-redis"
-  REDIS_PORT: "6379"
-  REDIS_PASSWORD: ""
+  JWT_TTL: "1440"
   
   # Mail
   MAIL_MAILER: "smtp"
   MAIL_HOST: "smtp.mailtrap.io"
   MAIL_PORT: "2525"
-  MAIL_ENCRYPTION: "tls"
-  MAIL_FROM_ADDRESS: "hello@example.com"
-  MAIL_FROM_NAME: "Laravel Vue Spa"
-  
-  # AWS
-  AWS_ACCESS_KEY_ID: ""
-  AWS_SECRET_ACCESS_KEY: ""
-  AWS_DEFAULT_REGION: "us-east-1"
-  AWS_BUCKET: ""
-  
-  # Pusher
-  PUSHER_APP_ID: ""
-  PUSHER_APP_KEY: ""
-  PUSHER_APP_CLUSTER: "mt1"
-  MIX_PUSHER_APP_KEY: "${PUSHER_APP_KEY}"
-  MIX_PUSHER_APP_CLUSTER: "${PUSHER_APP_CLUSTER}"
-  
-  # JWT
-  JWT_TTL: "1440"
+  MAIL_ENCRYPTION: "null"
+  MAIL_FROM_ADDRESS: "null"
+  MAIL_FROM_NAME: "${APP_NAME}"
 
-# ============================================
-# REDIS CONFIGURATION
-# ============================================
-redis:
-  enabled: true
-  image: redis:7-alpine
-  port: 6379
-  password: ""  # Empty = no auth (matches your local test)
-  persistence:
-    enabled: true
-    storageClass: "nfs-csi"
-    size: "5Gi"
-    accessMode: "ReadWriteOnce"
-  resources:
-    requests:
-      cpu: "500m"
-      memory: "512Mi"
-    limits:
-      cpu: "1"
-      memory: "1GB"
-
-# ============================================
-# SERVICE & INGRESS
-# ============================================
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 80
-
-ingress:
-  enabled: true
-  className: "nginx"  # Change if using different ingress controller
-  hosts:
-    - host: spa.getnatai.com
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            servicePort: 80
-#  tls:
-#    - secretName: spa-getnatai-com-tls
-#      hosts:
-#        - spa.getnatai.com
-
-# ============================================
-# ENVIRONMENT VARIABLES (SECRET)
-# ============================================
+# Secrets (base64 encoded)
 secrets:
-  enabled: true
-  
-  # Application secrets
-  appKey: "base64:sgztEi+QEaLgS+8MRSkG2X7cAE7pYEqIvKHKUrUfLhg="  
-  jwtSecret: "A9it6bRt3rf4yeiDaADCI27ttFFH9WfhlqWySqqHG0W3ivM5PZdmSfSunZVcBvJU"
-  
-  # Database credentials
-  dbHost: "45.125.222.194"
-  dbPort: "3306"
-  dbUsername: "root"
-  dbPassword: "84pgT4Lk_Ro}"
-
+  APP_KEY: "c2d6dEVpK1FFYUxnUys4TVJTa0cyWDdjQUU3cFlFcUl2S0hLVXJVZkxoZz0="
+  JWT_SECRET: "QTlpdDZiUnQzcmY0eWVpRGFBRENJMjd0dEZGSDlXZmhscVd5U3FxSEcwVzNpdk01UFpkbVNmU3VuWlZjQnZKVQ=="
