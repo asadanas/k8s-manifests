@@ -62,9 +62,9 @@ env:
   LOG_CHANNEL: "stack"
   DB_CONNECTION: "mysql"
   BROADCAST_DRIVER: "log"
-  CACHE_DRIVER: "file"
-  QUEUE_CONNECTION: "sync"
-  SESSION_DRIVER: "file"
+  CACHE_DRIVER: "redis"
+  QUEUE_CONNECTION: "redis"
+  SESSION_DRIVER: "redis"
   SESSION_LIFETIME: "120"
   JWT_TTL: "1440"
   
