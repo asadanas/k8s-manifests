@@ -26,11 +26,11 @@ spec:
               name: db-credentials
               key: password
         - name: CACHE_DRIVER
-          value: "file"  # Redis extension na thakle file use koro
+          value: "redis"
         - name: SESSION_DRIVER
-          value: "file"
+          value: "redis"
         - name: QUEUE_CONNECTION
-          value: "sync"
+          value: "redis"
         command:
         - php
         - artisan
