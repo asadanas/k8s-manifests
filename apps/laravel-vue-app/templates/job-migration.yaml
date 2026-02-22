@@ -2,38 +2,37 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: laravel-migration
-  namespace: {{ .Values.namespace }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": hook-succeeded
-  labels:
-    {{- include "laravel-vue-app.labels" . | nindent 4 }}
+  namespace: production
 spec:
   template:
     spec:
       restartPolicy: Never
       containers:
-        - name: migration
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          envFrom:
-            - configMapRef:
-                name: laravel-config
-            - secretRef:
-                name: laravel-secrets
-            - secretRef:
-                name: db-credentials
-          env:
-            - name: DB_HOST
-              value: {{ .Values.db.host | quote }}
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-credentials
-                  key: password
-          command:
-            - php
-            - artisan
-            - migrate
-            - --force
+      - name: migration
+        image: asadanas/laravel-vue-spa-2026-app:latest
+        envFrom:
+        - configMapRef:
+            name: laravel-config
+        - secretRef:
+            name: laravel-secrets
+        - secretRef:
+            name: db-credentials
+        env:
+        - name: DB_HOST
+          value: "45.125.222.194"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: CACHE_DRIVER
+          value: "file"  # Redis extension na thakle file use koro
+        - name: SESSION_DRIVER
+          value: "file"
+        - name: QUEUE_CONNECTION
+          value: "sync"
+        command:
+        - php
+        - artisan
+        - migrate
+        - --force
