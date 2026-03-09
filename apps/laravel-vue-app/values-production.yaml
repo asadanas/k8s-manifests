@@ -3,15 +3,15 @@ appLabel: laravel
 
 # Image settings for PHP app
 image:
-  repository: asadanas/laravel-vue-spa-2026-app
+  repository: asadanas/admin-app
   tag: latest
   pullPolicy: Always
 
-# Nginx settings - ETA ADD KORTE HOBE!
+# Nginx settings
 nginx:
   replicas: 2
   image:
-    repository: asadanas/laravel-vue-spa-2026-nginx
+    repository: asadanas/admin-nginx
     tag: latest
     pullPolicy: Always
   resources:
@@ -35,11 +35,7 @@ app:
 
 # Database
 db:
-  host: "45.125.222.194"
-  port: "3306"
   database: "laravel"
-  username: "root"
-  password: "84pgT4Lk_Ro}"
 
 # Redis
 redis:
@@ -76,7 +72,3 @@ env:
   MAIL_FROM_ADDRESS: "null"
   MAIL_FROM_NAME: "${APP_NAME}"
 
-# Secrets (base64 encoded)
-secrets:
-  APP_KEY: "c2d6dEVpK1FFYUxnUys4TVJTa0cyWDdjQUU3cFlFcUl2S0hLVXJVZkxoZz0="
-  JWT_SECRET: "QTlpdDZiUnQzcmY0eWVpRGFBRENJMjd0dEZGSDlXZmhscVd5U3FxSEcwVzNpdk01UFpkbVNmU3VuWlZjQnZKVQ=="
