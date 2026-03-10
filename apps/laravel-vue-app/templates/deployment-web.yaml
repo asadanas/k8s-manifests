@@ -33,8 +33,6 @@ spec:
             - secretRef:
                 name: db-credentials
           env:
-            - name: DB_HOST
-              value: {{ .Values.db.host | quote }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
