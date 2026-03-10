@@ -56,7 +56,6 @@ env:
   APP_DEBUG: "false"
   APP_URL: "http://localhost"
   LOG_CHANNEL: "stack"
-  DB_CONNECTION: "mysql"
   BROADCAST_DRIVER: "log"
   CACHE_DRIVER: "redis"
   QUEUE_CONNECTION: "redis"
