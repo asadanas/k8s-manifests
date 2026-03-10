@@ -2,6 +2,7 @@
 > GitOps-based deployment for the Laravel-Vue SPA application using Helm and ArgoCD.
 
 ## Repository Structure
+```
 k8s-manifests/
 ├── apps/
 │ └── laravel-vue-app/          # Helm chart for the application
@@ -18,7 +19,7 @@ k8s-manifests/
 ├── argocd/
 │ └── laravel-prod-app.yaml     # ArgoCD application definition
 └── README.md                   # This guide
-
+```
 ## Prerequisites
 
 ### Kubernetes Cluster Requirements
