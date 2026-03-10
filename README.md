@@ -5,20 +5,23 @@
 ```
 k8s-manifests/
 ├── apps/
-│ └── laravel-vue-app/          # Helm chart for the application
-│ ├── Chart.yaml                # Helm chart metadata
-│ ├── values-production.yaml    # Production values
-│ ├── templates/                # Kubernetes manifests
-│ │ ├── configmap-env.yaml      # Environment variables
-│ │ ├── deployment-web.yaml     # Web deployment
-│ │ ├── service-app.yaml        # Service definition
-│ │ ├── ingress.yaml            # Ingress rules
-│ │ ├── job-migration.yaml      # DB migration job
-│ │ ├── redis/                  # Redis manifests
-│ │ └── _helpers.tpl            # Helm helpers
+│ └── laravel-vue-app/                      # Helm chart for Laravel Vue SPA
+│ ├── Chart.yaml                            # Helm chart metadata
+│ ├── values-production.yaml                # Production configuration values
+│ └── templates/                            # Kubernetes manifest templates
+│ ├── _helpers.tpl                          # Helm template helpers
+│ ├── configmap-env.yaml                    # Non-sensitive environment variables
+│ ├── deployment-web.yaml                   # Laravel application deployment
+│ ├── service-app.yaml                      # Kubernetes Service definition
+│ ├── ingress.yaml                          # Ingress rules for external access
+│ ├── job-migration.yaml                    # Database migration job (manual trigger)
+│ └── redis/                                # Redis StatefulSet configuration
+│ ├── headless-service.yaml
+│ └── statefulset.yaml
 ├── argocd/
-│ └── laravel-prod-app.yaml     # ArgoCD application definition
-└── README.md                   # This guide
+│ └── laravel-prod-app.yaml                 # ArgoCD Application manifest
+├── k8s_HA_cluster_installation_guide.md    # Kubernetes cluster setup guide
+└── README.md # This file
 ```
 ## Prerequisites
 
