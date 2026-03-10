@@ -35,7 +35,9 @@ app:
 
 # Database
 db:
+  port: "3306"
   database: "laravel"
+  username: "root"
 
 # Redis
 redis:
