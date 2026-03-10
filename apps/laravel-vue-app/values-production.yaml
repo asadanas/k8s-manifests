@@ -44,6 +44,13 @@ redis:
     enabled: true
     size: 5Gi
     storageClass: nfs-csi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 300m
+      memory: 512Mi
 
 # Ingress
 domain: spa.getnatai.com
