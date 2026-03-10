@@ -21,8 +21,8 @@ spec:
     spec:
       containers:
         - name: app
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
           ports:
             - containerPort: 9000
           envFrom:
@@ -41,12 +41,7 @@ spec:
             - name: REDIS_HOST
               value: redis-headless
           resources:
-            limits:
-              memory: "1Gi"
-              cpu: "1"
-            requests:
-              memory: "512Mi"
-              cpu: "500m"
+            {{- toYaml .Values.app.resources | nindent 12 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -89,9 +84,4 @@ spec:
             - name: BACKEND_HOST
               value: laravel-app
           resources:
-            limits:
-              memory: "1Gi"
-              cpu: "1"
-            requests:
-              memory: "512Mi"
-              cpu: "500m"
+            {{- toYaml .Values.nginx.resources | nindent 12 }}
