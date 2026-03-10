@@ -42,12 +42,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
+            {{- toYaml .Values.redis.resources | nindent 12 }}
   volumeClaimTemplates:
     - metadata:
         name: redis-data
