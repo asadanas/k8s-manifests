@@ -80,7 +80,7 @@ This section walks you through creating the Helm chart structure from scratch, e
 
 #### 1.2 Clone to Your Local Machine
 ```bash
-git clone https://github.com/asadanas/k8s-manifests.git
+git clone https://github.com/Your_Username/k8s-manifests.git (Or paste your repo link instead of editing username)
 cd k8s-manifests
 ```
 ### STEP 2: CREATE COMPLETE HELM CHART
